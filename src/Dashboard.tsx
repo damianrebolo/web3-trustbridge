@@ -13,6 +13,8 @@ import {
   LogOut,
 } from "lucide-react";
 
+import logoUrl from "./assets/logo-dark.svg";
+
 interface DashboardProps {
   onLogout: () => void;
 }
@@ -57,10 +59,7 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           className="p-6 flex items-center gap-2 border-b border-white/5 cursor-pointer hover:bg-white/5"
           onClick={onLogout}
         >
-          <img
-            src={`${import.meta.env.PUBLIC_PATH}logo-dark.svg`}
-            alt="TrustBridge Dark Logo"
-          />
+          <img src={logoUrl} alt="TrustBridge Dark Logo" />
         </div>
 
         <nav className="flex-1 p-4 space-y-2">

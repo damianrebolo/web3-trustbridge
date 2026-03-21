@@ -14,6 +14,7 @@ interface LandingProps {
   onStart: () => void;
   onSearchCompany: () => void; // Added this prop
 }
+import logoUrl from "./assets/logo-icon-only.svg";
 
 const TrustBridgeLanding: React.FC<LandingProps> = ({
   onStart,
@@ -25,11 +26,7 @@ const TrustBridgeLanding: React.FC<LandingProps> = ({
       <nav className="fixed w-full z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img
-              src={`${import.meta.env.PUBLIC_PATH}logo-icon-only.svg`}
-              alt="Logo"
-              className="w-10 h-10"
-            />
+            <img src={logoUrl} alt="Logo" className="w-10 h-10" />
 
             <span className="text-xl font-bold tracking-tight text-white italic">
               TrustBridge
