@@ -57,12 +57,7 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           className="p-6 flex items-center gap-2 border-b border-white/5 cursor-pointer hover:bg-white/5"
           onClick={onLogout}
         >
-          <div className="bg-indigo-600 p-1 rounded-lg">
-            <ShieldCheck className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-bold text-white tracking-tight">
-            TrustBridge
-          </span>
+          <img src="/logo-dark.svg" alt="TrustBridge Dark Logo" />
         </div>
 
         <nav className="flex-1 p-4 space-y-2">

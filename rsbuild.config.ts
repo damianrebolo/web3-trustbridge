@@ -6,5 +6,9 @@ export default defineConfig({
   output: {
     assetPrefix: "/web3-trustbridge/",
   },
+  html: {
+    title: "TrustBridge",
+    favicon: "./public/logo.png",
+  },
   plugins: [pluginReact()],
 });

@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Globe,
   Star,
-  ExternalLink,
   CheckCircle,
   Building2,
 } from "lucide-react";
@@ -26,9 +25,8 @@ const TrustBridgeLanding: React.FC<LandingProps> = ({
       <nav className="fixed w-full z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <ShieldCheck className="w-6 h-6 text-white" />
-            </div>
+            <img src="/logo-icon-only.svg" alt="Logo" className="w-10 h-10" />
+
             <span className="text-xl font-bold tracking-tight text-white italic">
               TrustBridge
             </span>
