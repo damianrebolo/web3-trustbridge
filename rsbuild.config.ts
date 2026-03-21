@@ -1,7 +1,10 @@
-import { defineConfig } from '@rsbuild/core';
-import { pluginReact } from '@rsbuild/plugin-react';
+import { defineConfig } from "@rsbuild/core";
+import { pluginReact } from "@rsbuild/plugin-react";
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
+  output: {
+    assetPrefix: "/web3-trustbridge/",
+  },
   plugins: [pluginReact()],
 });
