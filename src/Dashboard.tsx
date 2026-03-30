@@ -39,7 +39,7 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   // Explicitly type the stars state
   const [stars, setStars] = useState<boolean[]>([true, false, false, false]);
   const [isStaking, setIsStaking] = useState<boolean>(false);
-  const [stakeAmount, setStakeAmount] = useState<number>(5000);
+  const [stakeAmount, setStakeAmount] = useState<number>(100000);
 
   const handleStake = () => {
     setIsStaking(true);
@@ -170,13 +170,13 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-slate-500">Amount to Stake</span>
                     <span className="text-white font-mono">
-                      {stakeAmount} MIOTA
+                      {stakeAmount} IOTA
                     </span>
                   </div>
                   <input
                     type="range"
                     min="1000"
-                    max="50000"
+                    max="100000"
                     step="1000"
                     value={stakeAmount}
                     onChange={(e) => setStakeAmount(Number(e.target.value))}
@@ -212,7 +212,8 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               description="Import your completed deal history to prove your reliability on-chain."
             >
               <button className="mt-4 w-full py-2 border border-white/10 hover:border-white/20 text-slate-300 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-                Connect Settlement Engine <ArrowUpRight size={14} />
+                Upload
+                <ArrowUpRight size={14} />
               </button>
             </ActionCard>
 
@@ -242,6 +243,14 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <p className="text-slate-500">
                 [ 14:20:01 ]{" "}
                 <span className="text-white font-bold">MSG_TYPE:</span>{" "}
+                DID_CREATED{" "}
+                <span className="text-indigo-400 italic">
+                  did:iota:test...:5369
+                </span>
+              </p>
+              <p className="text-slate-500">
+                [ 14:20:01 ]{" "}
+                <span className="text-white font-bold">MSG_TYPE:</span>{" "}
                 ANCHOR_PROFILE_METADATA{" "}
                 <span className="text-indigo-400 italic">0x72e...9a2</span>
               </p>
@@ -251,7 +260,7 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <span className="text-white font-bold">MSG_TYPE:</span>{" "}
                   STAKE_LOCK_EVENT{" "}
                   <span className="text-indigo-400 italic text-[9px]">
-                    Confirmed on Tangle
+                    Confirmed
                   </span>
                 </p>
               )}

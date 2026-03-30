@@ -156,7 +156,7 @@ const VerifierView: React.FC<VerifierProps> = ({ onBack }) => {
                   />
                   <TimelineItem
                     date="Nov 12, 2025"
-                    event="5,000 MIOTA Collateral Staked"
+                    event="100,000 IOTA Collateral Staked"
                     status="success"
                   />
                   <TimelineItem
@@ -181,7 +181,7 @@ const VerifierView: React.FC<VerifierProps> = ({ onBack }) => {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-400">Entity Legitimacy</span>
                     <span className="text-white font-mono text-xs italic">
-                      Confirmed by Auth-ID
+                      Confirmed by Gov-Auth-ID
                     </span>
                   </div>
                   <div className="pt-4 border-t border-white/5">
@@ -189,7 +189,7 @@ const VerifierView: React.FC<VerifierProps> = ({ onBack }) => {
                       <ShieldAlert size={14} /> Fraud Protection Active
                     </div>
                     <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
-                      In case of proven fraud, the 5,000 MIOTA stake is subject
+                      In case of proven fraud, the 100,000 IOTA stake is subject
                       to immediate redistribution.
                     </p>
                   </div>
