@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 
 import logoUrl from "./assets/logo-dark.svg";
+import CredentialsPage from "./CredentialsPage";
+import StakingPage from "./StakingPage";
 
 interface DashboardProps {
   onLogout: () => void;
@@ -24,6 +26,7 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 }
 
 interface ActionCardProps {
@@ -35,17 +38,20 @@ interface ActionCardProps {
   isConcept?: boolean;
 }
 
+type DashboardTab = "overview" | "credentials" | "staking" | "history";
+
+const FIXED_STAKE_AMOUNT = 100_000; // 100,000 IOTA ~ €5,000
+
 const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  // Explicitly type the stars state
   const [stars, setStars] = useState<boolean[]>([true, false, false, false]);
   const [isStaking, setIsStaking] = useState<boolean>(false);
-  const [stakeAmount, setStakeAmount] = useState<number>(100000);
+  const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
 
   const handleStake = () => {
     setIsStaking(true);
     setTimeout(() => {
       const newStars = [...stars];
-      newStars[1] = true; // Activate Star 2 (Staked)
+      newStars[1] = true;
       setStars(newStars);
       setIsStaking(false);
     }, 1500);
@@ -66,11 +72,27 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <NavItem
             icon={<LayoutDashboard size={18} />}
             label="Overview"
-            active
+            active={activeTab === "overview"}
+            onClick={() => setActiveTab("overview")}
           />
-          <NavItem icon={<FileText size={18} />} label="Credentials" />
-          <NavItem icon={<Coins size={18} />} label="Staking" />
-          <NavItem icon={<History size={18} />} label="Deal History" />
+          <NavItem
+            icon={<FileText size={18} />}
+            label="Credentials"
+            active={activeTab === "credentials"}
+            onClick={() => setActiveTab("credentials")}
+          />
+          <NavItem
+            icon={<Coins size={18} />}
+            label="Staking"
+            active={activeTab === "staking"}
+            onClick={() => setActiveTab("staking")}
+          />
+          <NavItem
+            icon={<History size={18} />}
+            label="Deal History"
+            active={activeTab === "history"}
+            onClick={() => setActiveTab("history")}
+          />
         </nav>
 
         <div className="p-4 mt-auto border-t border-white/5 space-y-4">
@@ -118,160 +140,180 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </div>
         </header>
 
-        <div className="p-8 max-w-5xl mx-auto space-y-8">
-          {/* Trust Score Banner */}
-          <section className="bg-gradient-to-r from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-8 flex justify-between items-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <ShieldCheck size={120} className="text-white" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Build Your Trust Record
-              </h3>
-              <p className="text-slate-400 max-w-md text-sm leading-relaxed">
-                Every star you earn is anchored to the IOTA Tangle, creating an
-                immutable proof of your business legitimacy.
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-4xl font-black text-white">
-                Level {stars.filter(Boolean).length}
-              </p>
-              <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest">
-                Active Star Rating
-              </p>
-            </div>
-          </section>
-
-          {/* Action Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <ActionCard
-              title="Verified Identity"
-              star="1"
-              active={stars[0]}
-              description="Upload Incorporation Documents and Business ID for Attester review."
-            >
-              <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-3">
-                <CheckCircle className="text-emerald-400" size={18} />
-                <span className="text-xs font-medium text-emerald-400">
-                  KYB Documents Verified by Global-ID
-                </span>
+        {/* Tab content */}
+        {activeTab === "overview" && (
+          <div className="p-8 max-w-5xl mx-auto space-y-8">
+            {/* Trust Score Banner */}
+            <section className="bg-gradient-to-r from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-8 flex justify-between items-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <ShieldCheck size={120} className="text-white" />
               </div>
-            </ActionCard>
-
-            <ActionCard
-              title="Staked Reputation"
-              star="2"
-              active={stars[1]}
-              description="Lock tokens as economic collateral. If fraud is proven, your stake is slashed."
-            >
-              {!stars[1] ? (
-                <div className="mt-4 space-y-3">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-500">Amount to Stake</span>
-                    <span className="text-white font-mono">
-                      {stakeAmount} IOTA
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1000"
-                    max="100000"
-                    step="1000"
-                    value={stakeAmount}
-                    onChange={(e) => setStakeAmount(Number(e.target.value))}
-                    className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-                  />
-                  <button
-                    onClick={handleStake}
-                    disabled={isStaking}
-                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
-                  >
-                    {isStaking ? "Anchoring on IOTA..." : "Commit Stake"}
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex justify-between items-center">
-                  <div className="flex items-center gap-3 text-indigo-400">
-                    <Coins size={18} />
-                    <span className="text-xs font-bold uppercase tracking-tight">
-                      Active Stake: {stakeAmount} MIOTA
-                    </span>
-                  </div>
-                  <button className="text-[10px] font-bold text-slate-500 hover:text-white uppercase">
-                    Manage
-                  </button>
-                </div>
-              )}
-            </ActionCard>
-
-            <ActionCard
-              title="Proven History"
-              star="3"
-              active={stars[2]}
-              description="Import your completed deal history to prove your reliability on-chain."
-            >
-              <button className="mt-4 w-full py-2 border border-white/10 hover:border-white/20 text-slate-300 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-                Upload
-                <ArrowUpRight size={14} />
-              </button>
-            </ActionCard>
-
-            <ActionCard
-              title="Social Vouchers"
-              star="4"
-              active={stars[3]}
-              description="Get trusted partners to sign a voucher for your business profile."
-              isConcept
-            >
-              <div className="mt-4 opacity-50 cursor-not-allowed">
-                <div className="flex items-center gap-2 text-xs text-indigo-300 font-bold mb-3 italic">
-                  <LinkIcon size={14} /> Request vouch from partner...
-                </div>
-                <div className="h-2 bg-slate-800 rounded-full w-full"></div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Build Your Trust Record
+                </h3>
+                <p className="text-slate-400 max-w-md text-sm leading-relaxed">
+                  Every star you earn is anchored to the IOTA Tangle, creating an
+                  immutable proof of your business legitimacy.
+                </p>
               </div>
-            </ActionCard>
-          </div>
+              <div className="text-right">
+                <p className="text-4xl font-black text-white">
+                  Level {stars.filter(Boolean).length}
+                </p>
+                <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest">
+                  Active Star Rating
+                </p>
+              </div>
+            </section>
 
-          {/* Real-time Integrity Feed */}
-          <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
-            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Real-time Integrity Feed (IOTA Tangle)
-            </h4>
-            <div className="font-mono text-[10px] space-y-2">
-              <p className="text-slate-500">
-                [ 14:20:01 ]{" "}
-                <span className="text-white font-bold">MSG_TYPE:</span>{" "}
-                DID_CREATED{" "}
-                <span className="text-indigo-400 italic">
-                  did:iota:test...:5369
-                </span>
-              </p>
-              <p className="text-slate-500">
-                [ 14:20:01 ]{" "}
-                <span className="text-white font-bold">MSG_TYPE:</span>{" "}
-                ANCHOR_PROFILE_METADATA{" "}
-                <span className="text-indigo-400 italic">0x72e...9a2</span>
-              </p>
-              {stars[1] && (
+            {/* Action Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <ActionCard
+                title="Verified Identity"
+                star="1"
+                active={stars[0]}
+                description="Upload Incorporation Documents and Business ID for Attester review."
+              >
+                <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-3">
+                  <CheckCircle className="text-emerald-400" size={18} />
+                  <span className="text-xs font-medium text-emerald-400">
+                    KYB Documents Verified by Global-ID
+                  </span>
+                </div>
+              </ActionCard>
+
+              <ActionCard
+                title="Staked Reputation"
+                star="2"
+                active={stars[1]}
+                description="Lock 100,000 IOTA (~€5,000) as economic collateral. If fraud is proven, your stake is slashed."
+              >
+                {!stars[1] ? (
+                  <div className="mt-4 space-y-3">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-slate-500">Required Stake</span>
+                      <span className="text-white font-mono">
+                        {FIXED_STAKE_AMOUNT.toLocaleString()} IOTA
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs mb-2">
+                      <span className="text-slate-500">Approx. Value</span>
+                      <span className="text-indigo-400 font-mono">~€5,000</span>
+                    </div>
+                    <button
+                      onClick={handleStake}
+                      disabled={isStaking}
+                      className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isStaking
+                        ? "Anchoring on IOTA..."
+                        : `Commit ${FIXED_STAKE_AMOUNT.toLocaleString()} IOTA`}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex justify-between items-center">
+                    <div className="flex items-center gap-3 text-indigo-400">
+                      <Coins size={18} />
+                      <span className="text-xs font-bold uppercase tracking-tight">
+                        Active Stake: {FIXED_STAKE_AMOUNT.toLocaleString()} IOTA
+                      </span>
+                    </div>
+                    <button
+                      className="text-[10px] font-bold text-slate-500 hover:text-white uppercase cursor-pointer"
+                      onClick={() => setActiveTab("staking")}
+                    >
+                      Manage
+                    </button>
+                  </div>
+                )}
+              </ActionCard>
+
+              <ActionCard
+                title="Proven History"
+                star="3"
+                active={stars[2]}
+                description="Import your completed deal history to prove your reliability on-chain."
+              >
+                <button className="mt-4 w-full py-2 border border-white/10 hover:border-white/20 text-slate-300 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                  Upload
+                  <ArrowUpRight size={14} />
+                </button>
+              </ActionCard>
+
+              <ActionCard
+                title="Third-party Vouchers"
+                star="4"
+                active={stars[3]}
+                description="Get trusted partners or accredited third parties to vouch for your business profile."
+                isConcept
+              >
+                <div className="mt-4 opacity-50 cursor-not-allowed">
+                  <div className="flex items-center gap-2 text-xs text-indigo-300 font-bold mb-3 italic">
+                    <LinkIcon size={14} /> Request vouch from partner...
+                  </div>
+                  <div className="h-2 bg-slate-800 rounded-full w-full"></div>
+                </div>
+              </ActionCard>
+            </div>
+
+            {/* Real-time Integrity Feed */}
+            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Real-time Integrity Feed (IOTA Tangle)
+              </h4>
+              <div className="font-mono text-[10px] space-y-2">
                 <p className="text-slate-500">
-                  [ 14:22:10 ]{" "}
+                  [ 14:20:01 ]{" "}
                   <span className="text-white font-bold">MSG_TYPE:</span>{" "}
-                  STAKE_LOCK_EVENT{" "}
-                  <span className="text-indigo-400 italic text-[9px]">
-                    Confirmed
+                  DID_CREATED{" "}
+                  <span className="text-indigo-400 italic">
+                    did:iota:test...:5369
                   </span>
                 </p>
-              )}
-              {isStaking && (
-                <p className="text-indigo-400 animate-pulse">
-                  [ JUST NOW ] SENDING STAKE_LOCK_EVENT TO TANGLE...
+                <p className="text-slate-500">
+                  [ 14:20:01 ]{" "}
+                  <span className="text-white font-bold">MSG_TYPE:</span>{" "}
+                  ANCHOR_PROFILE_METADATA{" "}
+                  <span className="text-indigo-400 italic">0x72e...9a2</span>
                 </p>
-              )}
+                {stars[1] && (
+                  <p className="text-slate-500">
+                    [ 14:22:10 ]{" "}
+                    <span className="text-white font-bold">MSG_TYPE:</span>{" "}
+                    STAKE_LOCK_EVENT{" "}
+                    <span className="text-indigo-400 italic text-[9px]">
+                      Confirmed — {FIXED_STAKE_AMOUNT.toLocaleString()} IOTA locked
+                    </span>
+                  </p>
+                )}
+                {isStaking && (
+                  <p className="text-indigo-400 animate-pulse">
+                    [ JUST NOW ] SENDING STAKE_LOCK_EVENT TO TANGLE...
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === "credentials" && <CredentialsPage />}
+        {activeTab === "staking" && (
+          <StakingPage isStaked={stars[1]} onStake={handleStake} isStaking={isStaking} />
+        )}
+        {activeTab === "history" && (
+          <div className="p-8 max-w-5xl mx-auto">
+            <div className="bg-slate-900 border border-white/5 rounded-2xl p-8 text-center">
+              <History size={48} className="text-slate-700 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-white mb-2">Deal History</h3>
+              <p className="text-sm text-slate-500">
+                No completed deals yet. Once you complete cross-border deals through
+                TrustBridge, they will appear here as on-chain evidence.
+              </p>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
@@ -279,9 +321,15 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
 // --- Sub-components (with TypeScript) ---
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, active = false }) => {
+const NavItem: React.FC<NavItemProps> = ({
+  icon,
+  label,
+  active = false,
+  onClick,
+}) => {
   return (
     <div
+      onClick={onClick}
       className={`flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-colors ${
         active
           ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20"
