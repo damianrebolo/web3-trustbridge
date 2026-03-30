@@ -199,7 +199,7 @@ const VerifierView: React.FC<VerifierProps> = ({ onBack }) => {
           </div>
 
           <div className="bg-slate-800/50 px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono text-slate-500 border-t border-white/5">
-            <span>DID: did:iota:7zW1p...xR92</span>
+            <span>DID: did:iota:test...:5369</span>
             <div className="flex items-center gap-4">
               <a
                 href="https://explorer.iota.org/object/0x3de46f837c3f0eb735737e55ed54fd85706163dd5f6345cc5589f18fceab5369?network=testnet"
