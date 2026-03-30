@@ -114,7 +114,7 @@ const TrustBridgeLanding: React.FC<LandingProps> = ({
                   level={2}
                   label="Staked"
                   detail="Skin in the Game"
-                  value="12,500 MIOTA"
+                  value="100,000 IOTA"
                   active
                 />
                 <div className="text-center py-2">
