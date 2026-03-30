@@ -268,9 +268,14 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   [ 14:20:01 ]{" "}
                   <span className="text-white font-bold">MSG_TYPE:</span>{" "}
                   DID_CREATED{" "}
-                  <span className="text-indigo-400 italic">
-                    did:iota:test...:5369
-                  </span>
+                  <a
+                    href="https://explorer.iota.org/object/0x3de46f837c3f0eb735737e55ed54fd85706163dd5f6345cc5589f18fceab5369?network=testnet"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-400 italic hover:text-indigo-300 underline underline-offset-2 decoration-indigo-400/30 hover:decoration-indigo-300 transition-colors"
+                  >
+                    did:iota:testnet:0x3de4...5369 ↗
+                  </a>
                 </p>
                 <p className="text-slate-500">
                   [ 14:20:01 ]{" "}
