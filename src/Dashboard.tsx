@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ShieldCheck,
   LayoutDashboard,
@@ -16,6 +16,7 @@ import {
 import logoUrl from "./assets/logo-dark.svg";
 import CredentialsPage from "./CredentialsPage";
 import StakingPage from "./StakingPage";
+import { identity, profiles, staking as stakingApi, audit, type DemoDID, type AuditEntry } from "./api";
 
 interface DashboardProps {
   onLogout: () => void;
@@ -46,15 +47,78 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [stars, setStars] = useState<boolean[]>([true, false, false, false]);
   const [isStaking, setIsStaking] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [demoDid, setDemoDid] = useState<DemoDID | null>(null);
+  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
+  const [apiReady, setApiReady] = useState(false);
 
-  const handleStake = () => {
+  // Initialize: load demo DID and create a profile on the backend
+  useEffect(() => {
+    (async () => {
+      try {
+        // Load real DID
+        const did = await identity.demo();
+        setDemoDid(did);
+
+        // Check if we already have a profile
+        const existing = await profiles.list();
+        if (existing.profiles.length > 0) {
+          const p = existing.profiles[0];
+          setProfileId(p.id);
+          setStars([p.isVerified, p.isStaked, p.isProven, p.isVouched]);
+        } else {
+          // Create a profile for Acme Global Labs
+          const result = await profiles.create(
+            'Acme Global Labs',
+            'acme-labs.io',
+            did.did
+          );
+          if (result.profileId) {
+            setProfileId(result.profileId);
+            // Mark as verified (star 1)
+            await profiles.verify(result.profileId);
+            setStars([true, false, false, false]);
+          }
+        }
+        setApiReady(true);
+
+        // Load audit log
+        const auditLog = await audit.log();
+        setAuditEntries(auditLog.log || []);
+      } catch (err) {
+        console.warn('API not available, using mock mode:', err);
+        setApiReady(false);
+      }
+    })();
+  }, []);
+
+  // Refresh audit log
+  const refreshAudit = useCallback(async () => {
+    try {
+      const auditLog = await audit.log();
+      setAuditEntries(auditLog.log || []);
+    } catch { /* ignore */ }
+  }, []);
+
+  const handleStake = async () => {
     setIsStaking(true);
-    setTimeout(() => {
+    try {
+      if (profileId && apiReady) {
+        await stakingApi.stake(profileId, 100_000);
+        await refreshAudit();
+      }
       const newStars = [...stars];
       newStars[1] = true;
       setStars(newStars);
+    } catch (err) {
+      console.error('Stake failed:', err);
+      // Still update UI
+      const newStars = [...stars];
+      newStars[1] = true;
+      setStars(newStars);
+    } finally {
       setIsStaking(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -269,21 +333,32 @@ const CompanyDashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <span className="text-white font-bold">MSG_TYPE:</span>{" "}
                   DID_CREATED{" "}
                   <a
-                    href="https://explorer.iota.org/object/0x3de46f837c3f0eb735737e55ed54fd85706163dd5f6345cc5589f18fceab5369?network=testnet"
+                    href={demoDid?.explorerUrl || "https://explorer.iota.org/object/0x3de46f837c3f0eb735737e55ed54fd85706163dd5f6345cc5589f18fceab5369?network=testnet"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-indigo-400 italic hover:text-indigo-300 underline underline-offset-2 decoration-indigo-400/30 hover:decoration-indigo-300 transition-colors"
                   >
-                    did:iota:testnet:0x3de4...5369 ↗
+                    {demoDid?.did ? `${demoDid.did.substring(0, 30)}...${demoDid.did.slice(-4)} ↗` : 'did:iota:testnet:0x3de4...5369 ↗'}
                   </a>
                 </p>
-                <p className="text-slate-500">
-                  [ 14:20:01 ]{" "}
-                  <span className="text-white font-bold">MSG_TYPE:</span>{" "}
-                  ANCHOR_PROFILE_METADATA{" "}
-                  <span className="text-indigo-400 italic">0x72e...9a2</span>
-                </p>
-                {stars[1] && (
+                {auditEntries.length > 0 ? (
+                  auditEntries.slice(0, 5).map((entry, i) => (
+                    <p key={entry.id || i} className="text-slate-500">
+                      [ {new Date(entry.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} ]{" "}
+                      <span className="text-white font-bold">MSG_TYPE:</span>{" "}
+                      {entry.eventType}{" "}
+                      <span className="text-indigo-400 italic">{entry.dataHash?.substring(0, 12)}...</span>
+                    </p>
+                  ))
+                ) : (
+                  <p className="text-slate-500">
+                    [ 14:20:01 ]{" "}
+                    <span className="text-white font-bold">MSG_TYPE:</span>{" "}
+                    ANCHOR_PROFILE_METADATA{" "}
+                    <span className="text-indigo-400 italic">0x72e...9a2</span>
+                  </p>
+                )}
+                {stars[1] && auditEntries.length === 0 && (
                   <p className="text-slate-500">
                     [ 14:22:10 ]{" "}
                     <span className="text-white font-bold">MSG_TYPE:</span>{" "}
